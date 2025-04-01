@@ -1,2 +1,27 @@
+# 環境變數
 .env
+
+# 系統文件
 .DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+.venv/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.egg-info/
+dist/
+build/
+
+# Docker
+docker-compose.override.yml
+
+# MongoDB
+mongodb_data/
