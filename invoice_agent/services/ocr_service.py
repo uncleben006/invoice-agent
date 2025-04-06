@@ -27,29 +27,31 @@ class OCRService:
         from invoice_agent.core.config import settings
         self.vision_credentials_path = settings.GOOGLE_VISION_CREDENTIALS_PATH
     
-    async def extract_text(self, image_url: str, file_type: str) -> str:
+    async def extract_text(self, file_url: str, file_type: str) -> Dict[str, Any]:
         """
         從 URL 獲取圖像並處理 OCR
         
         Args:
-            image_url: 圖像的 URL (Google Drive)
+            file_url: 圖像的 URL (Google Drive)
             file_type: 檔案類型 (image/png, application/pdf 等)
             
         Returns:
-            str: 識別出的文字
+            Dict[str, Any]: 包含識別出的文字和圖像 URL 的字典
         """
         try:
             logger.info(f"===================== 開始處理新的 URL =====================")
-            logger.info(f"處理 URL: {image_url}")
+            logger.info(f"處理 URL: {file_url}")
             
             # 下載檔案
-            content = await self.download_file(image_url)
+            content = await self.download_file(file_url)
             
             # 根據檔案類型處理
             if file_type.startswith('image/'):
                 # 影像檔案，直接使用 Google Vision API
                 logger.info("處理為圖像文件，使用 Google Vision API")
                 result = await self.process_image_with_vision(content)
+                # 添加圖像 URL 到結果
+                result["file_url"] = file_url
                 # 返回完整結果而不只是文本
                 return result
                 
@@ -57,12 +59,14 @@ class OCRService:
                 # PDF 檔案處理 - 首先檢查是否有文本層，然後決定是否使用 OCR
                 logger.info("處理為 PDF 文件")
                 text_result = await self.process_pdf(content)
-                # 對於 PDF，仍然只返回文本
-                return {"text": text_result, "paragraphs": []}
+                # 對於 PDF，仍然返回結構化結果，包含 file_url
+                return {"text": text_result, "paragraphs": [], "file_url": file_url}
             else:
                 # 默認作為圖像處理，也使用 Google Vision API
                 logger.warning(f"未知檔案類型: {file_type}，默認作為圖像處理，使用 Google Vision API")
                 result = await self.process_image_with_vision(content)
+                # 添加圖像 URL 到結果
+                result["file_url"] = file_url
                 return result
             
         except Exception as e:
@@ -452,7 +456,8 @@ class OCRService:
                     file_result.update({
                         "filename": filename,
                         "mimetype": file_type,
-                        "success": True
+                        "success": True,
+                        "file_url": file_url
                     })
                     results.append(file_result)
                 else:
@@ -461,7 +466,8 @@ class OCRService:
                         "filename": filename,
                         "mimetype": file_type,
                         "text": result,
-                        "success": True
+                        "success": True,
+                        "file_url": file_url
                     })
                 
             except Exception as e:

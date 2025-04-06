@@ -5,13 +5,13 @@ class OCRRequest(BaseModel):
     """
     OCR 請求模型
     """
-    image_url: str
+    file_url: str
     file_type: Optional[str] = None  # 可選的文件類型，例如 "image/png" 或 "application/pdf"
     
     model_config = {
         "json_schema_extra": {
             "example": {
-                "image_url": "https://drive.google.com/uc?id=1wOyPl78VCiFkU-uIogrBNbAvAqzIKy_z&export=download",
+                "file_url": "https://drive.google.com/uc?id=1wOyPl78VCiFkU-uIogrBNbAvAqzIKy_z&export=download",
                 "file_type": "image/png"
             }
         }
@@ -52,6 +52,7 @@ class OCRResponse(BaseModel):
     OCR 響應模型
     """
     raw_text: str
+    file_url: Optional[str]
     # 移除 LLM 相關欄位，OCR 純文字夠用
 
 class OCRBatchResponse(BaseModel):

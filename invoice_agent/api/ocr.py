@@ -17,14 +17,14 @@ async def extract_text_only(request: OCRRequest):
     此端點接收 URL（通常為 Google Drive）和檔案類型，使用 OCR 提取文本和位置信息
     
     返回：
-        - 對於圖像文件：完整文本、區塊信息（包含文本、位置座標和置信度）
-        - 對於 PDF 文件：僅返回提取的文本
+        - 對於圖像文件：完整文本、區塊信息（包含文本、位置座標和置信度）和原始圖像 URL
+        - 對於 PDF 文件：提取的文本和原始檔案 URL
     """
     try:
         # 使用 OCR 服務處理圖像，傳入檔案類型（如果提供）
-        result = await ocr_service.extract_text(request.image_url, file_type=request.file_type)
+        result = await ocr_service.extract_text(request.file_url, file_type=request.file_type)
         
-        # 直接返回結果（包含文本和區塊信息）
+        # 直接返回結果（包含文本、區塊信息和圖像 URL）
         return result
         
     except Exception as e:
