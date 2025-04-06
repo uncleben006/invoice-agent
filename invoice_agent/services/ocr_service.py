@@ -266,14 +266,12 @@ class OCRService:
                 "blocks": [
                     {
                         "text": "區塊文字",
-                        "bounding_box": {
-                            "vertices": [
-                                {"x": x1, "y": y1},
-                                {"x": x2, "y": y2},
-                                {"x": x3, "y": y3},
-                                {"x": x4, "y": y4}
-                            ]
-                        },
+                        "bounding_box": [
+                            {"x": x1, "y": y1},
+                            {"x": x2, "y": y2},
+                            {"x": x3, "y": y3},
+                            {"x": x4, "y": y4}
+                        ],
                         "confidence": 置信度
                     },
                     ...
@@ -296,7 +294,10 @@ class OCRService:
             
             # 配置語言提示 (支援中文繁體和英文)
             image_context = vision.ImageContext(
-                language_hints=['zh-Hant', 'en']
+                language_hints=['zh-Hant', 'en'],
+                text_detection_params=vision.TextDetectionParams(
+                    enable_text_detection_confidence_score=True
+                )
             )
             
             # 使用 document_text_detection 替代 text_detection，它更適合文檔結構，並提供更詳細的置信度
@@ -354,7 +355,7 @@ class OCRService:
                             # 提取單詞文本以構建段落文本
                             for word in paragraph.words:
                                 word_text = ''.join([symbol.text for symbol in word.symbols])
-                                paragraph_text += word_text + " "
+                                paragraph_text += word_text
                             
                             # 添加此段落的信息
                             if paragraph.bounding_box:
@@ -368,9 +369,7 @@ class OCRService:
                                 
                                 result["paragraphs"].append({
                                     "text": paragraph_text.strip(),
-                                    "bounding_box": {
-                                        "vertices": paragraph_vertices
-                                    },
+                                    "bounding_box": paragraph_vertices,
                                     "confidence": paragraph_confidence_percent,
                                     "paragraph_id": paragraph_count,
                                     "block_type": str(block_id)
@@ -404,9 +403,7 @@ class OCRService:
                     
                     result["paragraphs"].append({
                         "text": text_annotation.description,
-                        "bounding_box": {
-                            "vertices": vertices
-                        },
+                        "bounding_box": vertices,
                         "confidence": confidence_percent,
                         "paragraph_id": paragraph_count,
                         "block_type": "TEXT_ANNOTATION"
