@@ -31,3 +31,6 @@ vision-credentials.json
 
 # log
 *.log
+
+# 附件資料夾
+附件/
