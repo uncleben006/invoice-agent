@@ -25,3 +25,9 @@ docker-compose.override.yml
 
 # MongoDB
 mongodb_data/
+
+# Google Cloud 憑證
+vision-credentials.json
+
+# log
+*.log
