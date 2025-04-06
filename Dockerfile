@@ -7,6 +7,8 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         build-essential \
         python3-distutils \
+        poppler-utils \
+        libmagic1 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -24,6 +26,9 @@ RUN poetry install --no-interaction --no-ansi
 
 # 複製應用程式代碼
 COPY . .
+
+# 建立日誌目錄
+RUN mkdir -p /app/logs && chmod 777 /app/logs
 
 # 暴露應用埠
 EXPOSE 8008

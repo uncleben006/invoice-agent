@@ -1,6 +1,10 @@
 from pydantic import BaseModel
 import os
 from typing import Optional
+from pathlib import Path
+
+# 獲取專案根目錄路徑
+PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 class Settings(BaseModel):
     """
@@ -15,6 +19,9 @@ class Settings(BaseModel):
     MONGO_HOST: str = "localhost"
     MONGO_PORT: int = 27017
     MONGO_DB: str = "invoice_db"
+    
+    # OCR 設定
+    GOOGLE_VISION_CREDENTIALS_PATH: str = str(PROJECT_ROOT / "config" / "vision-credentials.json")
     
     # 建構 MongoDB 連接 URI
     @property
@@ -37,6 +44,10 @@ def get_settings() -> Settings:
         MONGO_HOST=os.getenv("MONGO_HOST", "localhost"),
         MONGO_PORT=int(os.getenv("MONGO_PORT", "27017")),
         MONGO_DB=os.getenv("MONGO_DB", "invoice_db"),
+        GOOGLE_VISION_CREDENTIALS_PATH=os.getenv(
+            "GOOGLE_APPLICATION_CREDENTIALS", 
+            str(PROJECT_ROOT / "config" / "vision-credentials.json")
+        ),
         DEBUG=os.getenv("DEBUG", "True").lower() in ("true", "1", "t"),
     )
 

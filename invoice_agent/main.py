@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
-from invoice_agent.api import v1
+from invoice_agent.api import ocr
 from invoice_agent.db.mongodb import connect_to_mongo, close_mongo_connection
+from invoice_agent.core.logging import logger
 
 app = FastAPI(
     title="Invoice Agent API",
@@ -21,8 +22,8 @@ async def startup():
 async def shutdown():
     await close_mongo_connection()
 
-# 註冊 API 路由
-app.include_router(v1.router)
+# 註冊 OCR API 路由
+app.include_router(ocr.router, prefix="/api")
 
 @app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui_html():

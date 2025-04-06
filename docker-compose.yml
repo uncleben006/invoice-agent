@@ -8,6 +8,8 @@ services:
       - "8008:8008"
     volumes:
       - .:/app
+      - ./logs:/app/logs
+      - ./config:/app/config
     depends_on:
       - mongodb
     env_file:
