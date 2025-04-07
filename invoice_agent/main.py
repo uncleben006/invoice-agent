@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
-from invoice_agent.api import ocr
+from invoice_agent.api import ocr, product
 from invoice_agent.db.mongodb import connect_to_mongo, close_mongo_connection
 from invoice_agent.core.logging import logger
 
@@ -24,6 +24,9 @@ async def shutdown():
 
 # 註冊 OCR API 路由
 app.include_router(ocr.router, prefix="/api")
+
+# 註冊產品 API 路由
+app.include_router(product.router, prefix="/api")
 
 @app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui_html():
