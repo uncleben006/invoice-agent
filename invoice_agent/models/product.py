@@ -12,6 +12,7 @@ class Product(BaseModel):
     name: str  # 品名
     unit: str  # 單位
     currency: str  # 幣別
+    price: float = 0.0  # 價格
 
 class ProductMatchResult(BaseModel):
     """
@@ -21,6 +22,7 @@ class ProductMatchResult(BaseModel):
     name: str
     unit: str
     currency: str
+    price: float = 0.0  # 價格
     match_score: float  # 匹配分數 (0-1)
     original_input: str  # 原始輸入的產品名稱
 
@@ -62,6 +64,7 @@ class ProductCheckResponse(BaseModel):
                         "name": "豬肉絲",
                         "unit": "斤",
                         "currency": "NTD",
+                        "price": 85.0,
                         "match_score": 1.0,
                         "original_input": "豬肉絲"
                     },
@@ -70,6 +73,7 @@ class ProductCheckResponse(BaseModel):
                         "name": "豬柳",
                         "unit": "斤",
                         "currency": "NTD",
+                        "price": 90.0,
                         "match_score": 0.6,
                         "original_input": "豬肉絲"
                     }

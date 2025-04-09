@@ -47,23 +47,23 @@ class ProductService:
                 headers = next(reader)
                 
                 # 檢查標題行格式是否正確
-                if len(headers) < 4 or '品號' not in headers[0] or '品名' not in headers[1]:
+                if len(headers) < 5 or '品號' not in headers[0] or '品名' not in headers[1] or '價格' not in headers[4]:
                     logger.error(f"產品資料檔案格式不正確，標題行：{headers}")
                     return False
                 
                 # 讀取產品資料
                 for row in reader:
-                    if len(row) >= 4:
-                        product = Product(
-                            product_id=row[0],
-                            name=row[1],
-                            unit=row[2],
-                            currency=row[3]
-                        )
-                        
-                        self.products.append(product)
-                        self.products_dict[product.product_id] = product
-                        self.products_name_dict[product.name] = product
+                    product = Product(
+                        product_id=row[0],
+                        name=row[1],
+                        unit=row[2],
+                        currency=row[3],
+                        price=row[4],
+                    )
+                    
+                    self.products.append(product)
+                    self.products_dict[product.product_id] = product
+                    self.products_name_dict[product.name] = product
             
             logger.info(f"成功載入 {len(self.products)} 筆產品資料")
             self.products_loaded = True
@@ -122,6 +122,7 @@ class ProductService:
                     name=product.name,
                     unit=product.unit,
                     currency=product.currency,
+                    price=product.price,
                     match_score=1.0,
                     original_input=product_name
                 )
@@ -164,6 +165,7 @@ class ProductService:
                     name=product.name,
                     unit=product.unit,
                     currency=product.currency,
+                    price=product.price,
                     match_score=score,
                     original_input=product_name
                 )
