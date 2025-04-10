@@ -266,12 +266,12 @@ class OCRService:
                 "blocks": [
                     {
                         "text": "區塊文字",
-                        "bounding_box": [
-                            {"x": x1, "y": y1},
-                            {"x": x2, "y": y2},
-                            {"x": x3, "y": y3},
-                            {"x": x4, "y": y4}
-                        ],
+                        "location": {
+                            "top": 19,
+                            "left": 14,
+                            "width": 262,
+                            "height": 97
+                        },
                         "confidence": 置信度
                     },
                     ...
@@ -359,17 +359,35 @@ class OCRService:
                             
                             # 添加此段落的信息
                             if paragraph.bounding_box:
-                                paragraph_vertices = [
-                                    {"x": vertex.x, "y": vertex.y} 
-                                    for vertex in paragraph.bounding_box.vertices
-                                ]
+                                # 獲取頂點座標
+                                vertices = paragraph.bounding_box.vertices
+                                
+                                # 計算 top、left、width、height
+                                # 找出最小的 x、y 和最大的 x、y 來計算邊界框
+                                left = min(vertex.x for vertex in vertices)
+                                top = min(vertex.y for vertex in vertices)
+                                right = max(vertex.x for vertex in vertices)
+                                bottom = max(vertex.y for vertex in vertices)
+                                width = right - left
+                                height = bottom - top
+                                
+                                # 將座標轉換為整數
+                                left = int(left)
+                                top = int(top)
+                                width = int(width)
+                                height = int(height)
                                 
                                 # 將段落置信度轉換為百分比
                                 paragraph_confidence_percent = round(paragraph_confidence * 100, 2) if paragraph_confidence > 0 else 0
                                 
                                 result["paragraphs"].append({
                                     "text": paragraph_text.strip(),
-                                    "bounding_box": paragraph_vertices,
+                                    "location": {
+                                        "top": top,
+                                        "left": left,
+                                        "width": width,
+                                        "height": height
+                                    },
                                     "confidence": paragraph_confidence_percent,
                                     "paragraph_id": paragraph_count,
                                     "block_type": str(block_id)
@@ -388,10 +406,22 @@ class OCRService:
                     if not hasattr(text_annotation, 'bounding_poly') or not text_annotation.bounding_poly:
                         continue
                     
-                    vertices = [
-                        {"x": vertex.x, "y": vertex.y} 
-                        for vertex in text_annotation.bounding_poly.vertices
-                    ]
+                    # 獲取頂點座標
+                    vertices = text_annotation.bounding_poly.vertices
+                    
+                    # 計算 top、left、width、height
+                    left = min(vertex.x for vertex in vertices)
+                    top = min(vertex.y for vertex in vertices)
+                    right = max(vertex.x for vertex in vertices)
+                    bottom = max(vertex.y for vertex in vertices)
+                    width = right - left
+                    height = bottom - top
+                    
+                    # 將座標轉換為整數
+                    left = int(left)
+                    top = int(top)
+                    width = int(width)
+                    height = int(height)
                     
                     # 獲取置信度（如果有）
                     confidence = 0.0
@@ -403,7 +433,12 @@ class OCRService:
                     
                     result["paragraphs"].append({
                         "text": text_annotation.description,
-                        "bounding_box": vertices,
+                        "location": {
+                            "top": top,
+                            "left": left,
+                            "width": width,
+                            "height": height
+                        },
                         "confidence": confidence_percent,
                         "paragraph_id": paragraph_count,
                         "block_type": "TEXT_ANNOTATION"
